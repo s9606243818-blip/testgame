@@ -32,3 +32,10 @@ body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:l
 .toast.success{background:#2e7d32}
 .toast.error{background:#c62828}
 @media(max-width:900px){.game-container{grid-template-columns:1fr}.cards-section{order:3}.online-players{order:2}.game-log{order:4}}
+
+/* Modal styles for duel */
+.modal{display:none;position:fixed;z-index:3000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
+.modal.active{display:flex}
+.modal-content{background:#fff;color:#222;padding:28px 24px;border-radius:12px;max-width:520px;width:90%;box-shadow:0 10px 28px rgba(0,0,0,.35);text-align:center}
+.modal-content h3{margin:0 0 10px;color:#d32f2f}
+.modal-buttons{display:flex;gap:12px;justify-content:center;margin-top:14px}

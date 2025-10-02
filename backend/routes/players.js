@@ -2,48 +2,60 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/database');
-const multer = require('multer');
-const path = require('path');
 
-const storage = multer.diskStorage({
-  destination: (req,file,cb)=>cb(null, path.join(__dirname,'../../static/avatars')),
-  filename: (req,file,cb)=>{ const ext = path.extname(file.originalname); cb(null, Date.now() + '_' + Math.random().toString(36).slice(2) + ext); }
-});
-const upload = multer({ storage });
-
-router.get('/online', (req,res)=>{ res.json(db.getOnlinePlayers()); });
-router.get('/:name', (req,res)=>{ const p=db.getPlayerByName(req.params.name); if(!p) return res.status(404).json({error:'Игрок не найден'}); res.json(p); });
-
-router.post('/avatar', upload.single('avatar'), (req,res)=>{
-  const playerName = req.body.playerName;
-  const io = req.app.get('io');
-  if (!playerName || !req.file) return res.status(400).json({ error: 'Неверные данные' });
-  const p = db.getPlayerByName(playerName);
-  if (!p) return res.status(404).json({ error: 'Игрок не найден' });
-  const avatarPath = '/static/avatars/' + req.file.filename;
-  db.setAvatar(playerName, avatarPath);
-  const updated = db.getPlayerByName(playerName);
-  io.emit('player_updated', updated);
-  io.emit('players_update', db.getOnlinePlayers());
-  io.emit('game_log', { message: '🖼️ ' + updated.name + ' обновил аватар', timestamp: Date.now() });
-  res.json({ message: 'Аватар обновлён', player: updated });
+router.get('/online', (req, res) => {
+  res.json(db.onlineList());
 });
 
-router.post('/setHealer', (req,res)=>{
-  const adminName = req.body.adminName;
-  const targetName = req.body.targetName;
-  const isHealer = !!req.body.isHealer;
-  const io = req.app.get('io');
-  const admin = db.getPlayerByName(adminName);
-  const target = db.getPlayerByName(targetName);
-  if (!admin || !target) return res.status(400).json({ error: 'Неверные игроки' });
-  if (!admin.is_admin) return res.status(403).json({ error: 'Нет прав' });
-  db.setHealer(targetName, isHealer);
-  const updated = db.getPlayerByName(targetName);
-  io.emit('player_updated', updated);
-  io.emit('players_update', db.getOnlinePlayers());
-  io.emit('game_log', { message: '👑 ' + admin.name + (isHealer ? ' назначил роль 🌿 Целителя у ' : ' снял роль 🌿 Целителя у ') + updated.name, timestamp: Date.now() });
-  res.json({ message: 'Роль обновлена', player: updated });
+router.get('/:name', (req, res) => {
+  const p = db.state.players[req.params.name];
+  if(!p) return res.json({ error: 'Игрок не найден' });
+  res.json(p);
+});
+
+router.post('/setHealer', (req, res) => {
+  const { adminName, targetName, isHealer } = req.body;
+  const admin = db.state.players[adminName];
+  const target = db.state.players[targetName];
+  if(!admin || !admin.is_admin) return res.json({ error: 'Только админ' });
+  if(!target) return res.json({ error: 'Игрок не найден' });
+  target.is_healer = !!isHealer;
+  res.json({ ok: true, player: target });
+});
+
+router.post('/avatar', (req, res) => {
+  // Для демо: просто ставим заглушку
+  const { playerName } = req.body || {};
+  const p = db.state.players[playerName];
+  if(!p) return res.json({ error: 'Игрок не найден' });
+  p.avatar = '/avatars/default.png';
+  res.json({ player: p });
+});
+
+router.post('/requestHealing', (req, res) => {
+  const { fromName } = req.body;
+  const p = db.state.players[fromName];
+  if(!p) return res.json({ error: 'Игрок не найден' });
+  // уведомление всем целителям
+  Object.values(db.state.players).forEach(pl => {
+    if(pl.is_healer){
+      pl.notifications.push({ type: 'heal_request', from: fromName, text: 'Нужна помощь! Срочно требуется исцеление.' });
+    }
+  });
+  res.json({ ok: true, message: 'Запрос на лечение отправлен целителю. Держись крепче, врач уже бежит!' });
+});
+
+router.post('/restart', (req, res) => {
+  const { adminName } = req.body;
+  const admin = db.state.players[adminName];
+  if(!admin || !admin.is_admin) return res.json({ error: 'Только админ' });
+  Object.values(db.state.players).forEach(p => {
+    p.level = 1; p.experience = 0; p.health = 100; p.max_health = 100;
+    p.wins = 0; p.losses = 0; p.cards_played = 0; p.cards_received = 0;
+    p.unconscious = false; p.roles.revealed = false; p.roles.ghost = false;
+    p.duelSent = {}; p.lastLevelForDuelQuota = 1; p.hand = []; p.usedCards = 0; p.notifications = [];
+  });
+  res.json({ ok: true });
 });
 
 module.exports = router;

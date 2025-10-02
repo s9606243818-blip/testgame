@@ -1,58 +1,71 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Card Duel Game v2</title>
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Game</title>
+  <link rel="stylesheet" href="/frontend/styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
 </head>
 <body>
-  <div id="toast-container"></div>
-  <div id="app">
-    <div id="login-screen" class="screen active">
-      <div class="login-container">
-        <h1>Card Duel Game v2</h1>
-        <input type="text" id="player-name-input" placeholder="Имя (добавь 'admin' в конце для админа)" maxlength="24">
-        <button id="login-btn">Войти</button>
-        <p id="login-error" class="error"></p>
-      </div>
+  <div id="login-screen" class="screen active">
+    <div class="login-container">
+      <h2>Вход</h2>
+      <input id="player-name-input" placeholder="Ваше имя" />
+      <div class="error" id="login-error"></div>
+      <button id="login-btn">Войти</button>
     </div>
+  </div>
 
-    <div id="game-screen" class="screen">
-      <div class="game-container">
-        <div class="player-card">
-          <img id="player-avatar" src="/static/avatars/default.png" alt="Avatar">
-          <label class="upload-btn">Загрузить аватар
-            <input type="file" id="avatar-input" accept="image/*" hidden>
-          </label>
-          <h2 id="player-name">Player</h2>
-          <div class="stats">
-            <p>Уровень: <span id="player-level">1</span></p>
-            <p>HP: <span id="player-health">100</span>/<span id="player-max-health">100</span></p>
-            <p>Опыт: <span id="player-exp">0</span>/100</p>
-            <p>Побед: <span id="player-wins">0</span> | Поражений: <span id="player-losses">0</span></p>
-            <p>Карты: <span id="player-cards-played">0</span>/<span id="player-cards-received">0</span></p>
-            <p>Роли: <span id="player-roles">—</span></p>
-          </div>
+  <div id="game-screen" class="screen">
+    <div class="game-container">
+      <div class="player-card">
+        <img id="player-avatar" src="/avatars/default.png" alt="avatar" />
+        <div><strong id="player-name"></strong> <span id="player-roles"></span></div>
+        <div>Lvl <span id="player-level"></span> • HP <span id="player-health"></span>/<span id="player-max-health"></span></div>
+        <div>EXP: <span id="player-exp"></span></div>
+        <div>Побед: <span id="player-wins"></span> • Поражений: <span id="player-losses"></span></div>
+        <div>Карты: на руках <span id="player-cards-onhand">0</span> • использовано <span id="player-cards-used">0</span></div>
+        <label class="upload-btn">Загрузить аватар<input id="avatar-input" type="file" hidden /></label>
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="request-heal-btn" class="btn-success">Запросить лечение</button>
+          <button id="deal-action-card-btn" class="btn-success">Выдать карту действия</button>
+          <button id="restart-btn" class="btn-danger">Перезапустить игру (админ)</button>
+          <button id="guess-role-btn" class="btn-danger">Угадать роль</button>
         </div>
-        <div class="cards-section">
-          <h3>Карты</h3>
-          <p class="hint">Атакующие — всем, лечебные — только целителю и только на другого игрока</p>
-          <div id="cards-container" class="cards-grid"></div>
-        </div>
-        <div class="online-players">
-          <h3>Игроки онлайн</h3>
-          <div id="online-players-list"></div>
-        </div>
-        <div class="game-log">
-          <h3>Лог игры</h3>
-          <div id="log-messages"></div>
-        </div>
+      </div>
+
+      <div class="cards-section">
+        <h3>Карты</h3>
+        <div id="cards-container" class="cards-grid"></div>
+      </div>
+
+      <div class="online-players">
+        <h3>Игроки онлайн</h3>
+        <div id="online-players-list"></div>
+      </div>
+
+      <div class="game-log">
+        <h3>Логи</h3>
+        <div id="log-messages"></div>
       </div>
     </div>
   </div>
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="app.js"></script>
+
+  <!-- Duel Modal -->
+  <div id="duel-modal" class="modal">
+    <div class="modal-content">
+      <h3>Вызов на дуэль</h3>
+      <p id="duel-message"></p>
+      <div class="modal-buttons">
+        <button id="accept-duel-btn" class="btn-success">Принять</button>
+        <button id="decline-duel-btn" class="btn-danger">Отклонить</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container"></div>
+  <script src="/frontend/app.js"></script>
 </body>
 </html>

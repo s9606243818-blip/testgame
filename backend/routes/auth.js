@@ -4,13 +4,11 @@ const router = express.Router();
 const db = require('../db/database');
 
 router.post('/login', (req, res) => {
-  const name = (req.body.name || '').trim();
-  if (!name) return res.status(400).json({ error: 'Имя не может быть пустым' });
-  let player = db.getPlayerByName(name);
-  const isAdmin = name.toLowerCase().endsWith('admin') ? 1 : 0;
-  if (!player) { player = db.createPlayer(name, isAdmin); }
-  else if (isAdmin && !player.is_admin) { player.is_admin = 1; db.updatePlayer(player); }
-  res.json({ player: db.getPlayerByName(name) });
+  const { name } = req.body;
+  if(!name) return res.json({ error: 'Укажите имя' });
+  const p = db.ensurePlayer(name.trim());
+  db.assignRolesIfNeeded(p);
+  return res.json({ player: p });
 });
 
 module.exports = router;
