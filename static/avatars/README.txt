@@ -1,0 +1,1 @@
+Place default.png here if needed. Uploaded avatars will appear here.

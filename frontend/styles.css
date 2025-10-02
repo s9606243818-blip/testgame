@@ -1,0 +1,34 @@
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;min-height:100vh}
+.screen{display:none}
+.screen.active{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-container{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);padding:40px;border-radius:20px;text-align:center;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
+.login-container input,.login-container button{width:100%;padding:14px;border-radius:10px;border:none;margin:10px 0}
+.login-container button{background:#4CAF50;color:#fff;font-weight:600;cursor:pointer}
+.error{color:#ffb3b3}
+.game-container{width:96%;max-width:1400px;margin:20px auto;display:grid;grid-template-columns:1fr 2fr 1fr;gap:20px}
+.player-card,.cards-section,.online-players{background:rgba(255,255,255,.12);border-radius:14px;padding:18px}
+.player-card img{width:120px;height:120px;border-radius:50%;border:4px solid #fff;margin-bottom:10px;object-fit:cover}
+.upload-btn{display:inline-block;background:rgba(0,0,0,.2);padding:8px 12px;border-radius:8px;cursor:pointer}
+.stats p{margin:8px 0}
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.card{background:rgba(255,255,255,.22);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
+.card:hover{transform:translateY(-3px)}
+.card.attack{border:2px solid #ff6b6b}
+.card.heal{border:2px solid #4CAF50}
+.card.disabled{opacity:.5;cursor:not-allowed}
+.online-players .player-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.18);padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer}
+.player-item img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #fff}
+.player-item .meta{font-size:12px;opacity:.9}
+.player-item.selected{outline:2px solid #4CAF50}
+.game-log{grid-column:1/-1;background:rgba(0,0,0,.35);border-radius:14px;padding:16px;max-height:260px;overflow-y:auto}
+.log-message{background:rgba(255,255,255,.12);padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:14px}
+.btn-success,.btn-danger{padding:10px 18px;border:none;border-radius:8px;cursor:pointer}
+.btn-success{background:#4CAF50;color:#fff}
+.btn-danger{background:#f44336;color:#fff}
+#toast-container{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:2000}
+.toast{background:#222;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.35);opacity:.95}
+.toast.success{background:#2e7d32}
+.toast.error{background:#c62828}
+@media(max-width:900px){.game-container{grid-template-columns:1fr}.cards-section{order:3}.online-players{order:2}.game-log{order:4}}
