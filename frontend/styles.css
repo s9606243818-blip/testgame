@@ -1,41 +1,430 @@
+:root {
+  --bg-primary: #0b0f19;
+  --bg-secondary: #101628;
+  --bg-tertiary: #1a2240;
+  --border: #20304d;
+  --text-primary: #eaeef5;
+  --text-secondary: #9ca3af;
+  --accent: #3b82f6;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+}
 
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;min-height:100vh}
-.screen{display:none}
-.screen.active{display:flex;align-items:center;justify-content:center;min-height:100vh}
-.login-container{background:rgba(255,255,255,.1);backdrop-filter:blur(10px);padding:40px;border-radius:20px;text-align:center;width:90%;max-width:420px;box-shadow:0 8px 32px rgba(0,0,0,.3)}
-.login-container input,.login-container button{width:100%;padding:14px;border-radius:10px;border:none;margin:10px 0}
-.login-container button{background:#4CAF50;color:#fff;font-weight:600;cursor:pointer}
-.error{color:#ffb3b3}
-.game-container{width:96%;max-width:1400px;margin:20px auto;display:grid;grid-template-columns:1fr 2fr 1fr;gap:20px}
-.player-card,.cards-section,.online-players{background:rgba(255,255,255,.12);border-radius:14px;padding:18px}
-.player-card img{width:120px;height:120px;border-radius:50%;border:4px solid #fff;margin-bottom:10px;object-fit:cover}
-.upload-btn{display:inline-block;background:rgba(0,0,0,.2);padding:8px 12px;border-radius:8px;cursor:pointer}
-.stats p{margin:8px 0}
-.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
-.card{background:rgba(255,255,255,.22);border-radius:10px;padding:12px;text-align:center;cursor:pointer;transition:.2s}
-.card:hover{transform:translateY(-3px)}
-.card.attack{border:2px solid #ff6b6b}
-.card.heal{border:2px solid #4CAF50}
-.card.disabled{opacity:.5;cursor:not-allowed}
-.online-players .player-item{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.18);padding:10px;border-radius:10px;margin-bottom:8px;cursor:pointer}
-.player-item img{width:34px;height:34px;border-radius:50%;object-fit:cover;border:2px solid #fff}
-.player-item .meta{font-size:12px;opacity:.9}
-.player-item.selected{outline:2px solid #4CAF50}
-.game-log{grid-column:1/-1;background:rgba(0,0,0,.35);border-radius:14px;padding:16px;max-height:260px;overflow-y:auto}
-.log-message{background:rgba(255,255,255,.12);padding:8px 10px;border-radius:8px;margin-bottom:6px;font-size:14px}
-.btn-success,.btn-danger{padding:10px 18px;border:none;border-radius:8px;cursor:pointer}
-.btn-success{background:#4CAF50;color:#fff}
-.btn-danger{background:#f44336;color:#fff}
-#toast-container{position:fixed;right:12px;bottom:12px;display:flex;flex-direction:column;gap:8px;z-index:2000}
-.toast{background:#222;color:#fff;padding:10px 14px;border-radius:8px;box-shadow:0 6px 16px rgba(0,0,0,.35);opacity:.95}
-.toast.success{background:#2e7d32}
-.toast.error{background:#c62828}
-@media(max-width:900px){.game-container{grid-template-columns:1fr}.cards-section{order:3}.online-players{order:2}.game-log{order:4}}
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-/* Modal styles for duel */
-.modal{display:none;position:fixed;z-index:3000;left:0;top:0;width:100%;height:100%;background:rgba(0,0,0,.7);align-items:center;justify-content:center}
-.modal.active{display:flex}
-.modal-content{background:#fff;color:#222;padding:28px 24px;border-radius:12px;max-width:520px;width:90%;box-shadow:0 10px 28px rgba(0,0,0,.35);text-align:center}
-.modal-content h3{margin:0 0 10px;color:#d32f2f}
-.modal-buttons{display:flex;gap:12px;justify-content:center;margin-top:14px}
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.5;
+}
+
+/* Login Screen */
+.login-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--bg-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.login-box {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+}
+
+.login-box h1 {
+  margin-bottom: 24px;
+  font-size: 28px;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  font-size: 16px;
+  margin-bottom: 16px;
+}
+
+.login-box input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Mobile Navigation */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  padding: 8px;
+  gap: 8px;
+  z-index: 100;
+}
+
+.mobile-nav .tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.mobile-nav .tab.active {
+  background: var(--bg-tertiary);
+  color: var(--accent);
+}
+
+/* Container */
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 20px;
+  display: grid;
+  grid-template-columns: 350px 1fr 400px;
+  gap: 20px;
+}
+
+/* Panels */
+.panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 20px;
+  height: fit-content;
+}
+
+.panel h3 {
+  margin-bottom: 16px;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.section {
+  margin-top: 24px;
+}
+
+/* Profile Card */
+.profile-card {
+  margin-bottom: 20px;
+}
+
+.profile-card .top {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.profile-card img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  object-fit: cover;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-card h2 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.player-stats {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.roles-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Players List */
+#online-players-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.player-item {
+  display: flex;
+  gap: 12px;
+  padding: 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  margin-bottom: 8px;
+}
+
+.player-item:hover {
+  background: var(--bg-tertiary);
+}
+
+.player-item.selected {
+  background: var(--bg-tertiary);
+  border-color: var(--accent);
+}
+
+.player-item img, .avatar-placeholder {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.player-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+.role-text {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+/* Cards */
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.card {
+  background: var(--bg-tertiary);
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.card.attack {
+  border-color: var(--danger);
+}
+
+.card.heal {
+  border-color: var(--success);
+}
+
+.card.action {
+  border-color: #a855f7;
+}
+
+.card.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.card h4 {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.card .note {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* Buttons */
+.btn {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-block;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn.primary {
+  background: var(--accent);
+  color: white;
+}
+
+.btn.primary:hover:not(:disabled) {
+  background: #2563eb;
+}
+
+.btn.secondary {
+  background: var(--bg-tertiary);
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  margin: 4px;
+}
+
+.btn.secondary:hover:not(:disabled) {
+  background: #28406b;
+}
+
+/* Admin Section */
+.admin-section {
+  margin-top: 16px;
+}
+
+.admin-section button {
+  width: 100%;
+  margin-bottom: 8px;
+}
+
+/* Tasks */
+.task {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+
+.task strong {
+  color: var(--accent);
+}
+
+.task .note {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 4px;
+}
+
+/* Logs */
+.log-container {
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  background: var(--bg-primary);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+.log-line {
+  font-size: 13px;
+  margin-bottom: 6px;
+  padding: 6px;
+  border-radius: 4px;
+  background: var(--bg-tertiary);
+}
+
+.log-line .note {
+  color: var(--text-secondary);
+  font-size: 11px;
+  margin-left: 8px;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.8);
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 500px;
+  width: 90%;
+}
+
+.modal-content h2 {
+  margin-bottom: 16px;
+}
+
+.modal-content p {
+  margin-bottom: 24px;
+  color: var(--text-secondary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.modal-actions button {
+  flex: 1;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #28406b;
+}
+
+/* Mobile */
+@media (max-width: 900px) {
+  .container {
+    grid-template-columns: 1fr;
+    padding: 12px;
+    padding-bottom: 70px;
+  }
+  
+  .mobile-nav {
+    display: flex;
+  }
+  
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 901px) and (max-width: 1400px) {
+  .container {
+    grid-template-columns: 300px 1fr 350px;
+  }
+}

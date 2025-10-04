@@ -1,18 +1,16 @@
 {
-  "name": "game-app-v2",
-  "version": "2.0.0",
-  "description": "Multiplayer card game v2",
-  "main": "backend/server.js",
+  "name": "duel-game",
+  "version": "7.0.0",
+  "private": true,
   "scripts": {
     "start": "node backend/server.js"
   },
   "dependencies": {
-    "better-sqlite3": "^9.2.2",
-    "body-parser": "^2.2.0",
-    "cors": "^2.8.5",
-    "express": "^4.21.2",
+    "express": "^4.19.2",
+    "http": "^0.0.1-security",
+    "socket.io": "^4.7.5",
     "multer": "^1.4.5-lts.1",
-    "socket.io": "^4.8.1",
-    "uuid": "^8.3.2"
+    "nanoid": "^5.0.6",
+    "cors": "^2.8.5"
   }
 }

@@ -1,71 +1,128 @@
-
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Game</title>
-  <link rel="stylesheet" href="/frontend/styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.2/dist/socket.io.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Duel Game v7.0</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div id="login-screen" class="screen active">
-    <div class="login-container">
-      <h2>Вход</h2>
-      <input id="player-name-input" placeholder="Ваше имя" />
-      <div class="error" id="login-error"></div>
-      <button id="login-btn">Войти</button>
+  <!-- Login Screen -->
+  <div id="login-screen" class="login-screen">
+    <div class="login-box">
+      <h1>🎮 Duel Game v7.0</h1>
+      <input type="text" id="player-name-input" placeholder="Введите ваше имя" maxlength="20">
+      <button id="login-btn" class="btn primary">Войти в игру</button>
     </div>
   </div>
 
-  <div id="game-screen" class="screen">
-    <div class="game-container">
-      <div class="player-card">
-        <img id="player-avatar" src="/avatars/default.png" alt="avatar" />
-        <div><strong id="player-name"></strong> <span id="player-roles"></span></div>
-        <div>Lvl <span id="player-level"></span> • HP <span id="player-health"></span>/<span id="player-max-health"></span></div>
-        <div>EXP: <span id="player-exp"></span></div>
-        <div>Побед: <span id="player-wins"></span> • Поражений: <span id="player-losses"></span></div>
-        <div>Карты: на руках <span id="player-cards-onhand">0</span> • использовано <span id="player-cards-used">0</span></div>
-        <label class="upload-btn">Загрузить аватар<input id="avatar-input" type="file" hidden /></label>
-        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
-          <button id="request-heal-btn" class="btn-success">Запросить лечение</button>
-          <button id="deal-action-card-btn" class="btn-success">Выдать карту действия</button>
-          <button id="restart-btn" class="btn-danger">Перезапустить игру (админ)</button>
-          <button id="guess-role-btn" class="btn-danger">Угадать роль</button>
+  <!-- Mobile Navigation -->
+  <div class="mobile-nav">
+    <div class="tab active" data-tab="profile">👤 Профиль</div>
+    <div class="tab" data-tab="cards">🎴 Карты</div>
+    <div class="tab" data-tab="logs">📜 Логи</div>
+  </div>
+
+  <!-- Main Container -->
+  <div class="container">
+    <!-- Left Panel: Profile & Players -->
+    <div class="panel">
+      <div class="profile-card">
+        <div class="top">
+          <img id="player-avatar" src="/avatars/default.png" alt="Avatar">
+          <div>
+            <h2 id="player-name">Игрок</h2>
+            <div class="player-stats">
+              <div>Lvl <span id="player-level">1</span></div>
+              <div>HP <span id="player-health">100</span>/<span id="player-max-health">100</span></div>
+              <div>XP <span id="player-exp">0</span>/100</div>
+            </div>
+            <div id="player-roles" class="roles-text">Роли: —</div>
+          </div>
         </div>
+        <label for="avatar-input" class="btn secondary" style="margin-top:10px;cursor:pointer;">📷 Изменить аватар</label>
+        <input type="file" id="avatar-input" accept="image/*" style="display:none;">
       </div>
 
-      <div class="cards-section">
-        <h3>Карты</h3>
-        <div id="cards-container" class="cards-grid"></div>
-      </div>
-
-      <div class="online-players">
-        <h3>Игроки онлайн</h3>
+      <div class="section">
+        <h3>👥 Игроки онлайн</h3>
         <div id="online-players-list"></div>
       </div>
 
-      <div class="game-log">
-        <h3>Логи</h3>
-        <div id="log-messages"></div>
+      <div class="section">
+        <button id="request-heal-btn" class="btn secondary">🌿 Запросить исцеление</button>
+        <button id="request-card-btn" class="btn secondary">🎴 Запросить купон</button>
       </div>
+
+      <!-- Admin Controls -->
+      <div class="admin-section">
+        <button id="set-healer-btn" class="btn secondary" style="display:none;">Назначить целителя</button>
+        <button id="unset-healer-btn" class="btn secondary" style="display:none;">Снять целителя</button>
+        <button id="set-dealer-btn" class="btn secondary" style="display:none;">Назначить дилера</button>
+        <button id="unset-dealer-btn" class="btn secondary" style="display:none;">Снять дилера</button>
+        <button id="set-bartender-btn" class="btn secondary" style="display:none;">Назначить бармена</button>
+        <button id="unset-bartender-btn" class="btn secondary" style="display:none;">Снять бармена</button>
+        <button id="restart-btn" class="btn primary" style="display:none;">🔄 Перезапустить игру</button>
+        <button id="deal-cards-to-all-btn" class="btn primary" style="display:none;">🎴 Выдать всем по 2 купона</button>
+      </div>
+
+      <!-- Healer Panel -->
+      <div id="healer-panel" class="admin-section" style="display:none;">
+        <h3>🌿 Целитель: Задачи</h3>
+        <div id="healer-tasks"></div>
+      </div>
+
+      <!-- Dealer Panel -->
+      <div id="dealer-panel" class="admin-section" style="display:none;">
+        <h3>🎴 Дилер: Запросы</h3>
+        <div id="dealer-requests"></div>
+      </div>
+
+      <!-- Bartender Panel -->
+      <div id="bartender-panel" class="admin-section" style="display:none;">
+        <h3>🍹 Бармен: Заказы</h3>
+        <div id="bartender-tasks"></div>
+      </div>
+    </div>
+
+    <!-- Center Panel: Cards -->
+    <div class="panel">
+      <h3>🎴 Мои карты <span id="my-hand-count"></span></h3>
+      <div id="cards-container" class="cards-grid"></div>
+
+      <!-- Мои задания -->
+      <div class="section" style="margin-top: 30px;">
+        <h3>📋 Мои задания (что я должен сделать)</h3>
+        <div id="my-tasks"></div>
+      </div>
+
+      <!-- Задания для подтверждения -->
+      <div class="section" style="margin-top: 30px;">
+        <h3>✅ Подтверждение заданий (я инициатор)</h3>
+        <div id="initiated-tasks"></div>
+      </div>
+    </div>
+
+    <!-- Right Panel: Logs -->
+    <div class="panel">
+      <h3>📜 Логи событий</h3>
+      <div id="log-messages" class="log-container"></div>
     </div>
   </div>
 
   <!-- Duel Modal -->
   <div id="duel-modal" class="modal">
     <div class="modal-content">
-      <h3>Вызов на дуэль</h3>
-      <p id="duel-message"></p>
-      <div class="modal-buttons">
-        <button id="accept-duel-btn" class="btn-success">Принять</button>
-        <button id="decline-duel-btn" class="btn-danger">Отклонить</button>
+      <h2 id="duel-title">Вызов на дуэль</h2>
+      <p id="duel-text"></p>
+      <div class="modal-actions">
+        <button id="duel-accept" class="btn primary">✅ Принять</button>
+        <button id="duel-decline" class="btn secondary">❌ Отклонить</button>
       </div>
     </div>
   </div>
 
-  <div id="toast-container"></div>
-  <script src="/frontend/app.js"></script>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
